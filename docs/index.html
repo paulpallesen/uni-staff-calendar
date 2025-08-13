@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>University Staff Calendar — Subscribe</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root { --bg:#0f172a; --card:#111827; --text:#e5e7eb; --muted:#9ca3af; --accent:#4f46e5; }
+    *{box-sizing:border-box}
+    body{margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; background:linear-gradient(120deg,#0b1023,#101b3a); color:var(--text);}
+    .wrap{max-width:960px; margin:auto; padding:32px 20px 64px;}
+    header{display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:28px;}
+    .brand{display:flex; align-items:center; gap:12px;}
+    .logo{width:44px; height:44px; background:#1f2937; border-radius:10px; display:grid; place-items:center; font-weight:700; color:#a5b4fc;}
+    h1{margin:0; font-size:1.6rem}
+    .card{background:rgba(17,24,39,.7); border:1px solid rgba(255,255,255,.08); border-radius:16px; padding:20px; backdrop-filter: blur(6px);}
+    .grid{display:grid; grid-template-columns:1fr; gap:16px;}
+    @media (min-width:800px){ .grid{grid-template-columns:2fr 1fr;} }
+    .btns{display:flex; flex-wrap:wrap; gap:10px; margin-top:8px;}
+    a.btn, button.btn{appearance:none; border:1px solid rgba(255,255,255,.15); color:var(--text); background:#0b1224; padding:12px 14px; border-radius:10px; cursor:pointer; text-decoration:none; transition:.15s transform, .15s border-color}
+    a.btn:hover, button.btn:hover{transform:translateY(-1px); border-color:var(--accent);}
+    small{color:var(--muted)}
+    .section{margin-top:22px}
+    .tag{display:inline-block; padding:2px 8px; border-radius:999px; font-size:.75rem; background:#111827; border:1px solid rgba(255,255,255,.08); color:#a5b4fc;}
+    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color:#c7d2fe;}
+    .qr{background:#0b1224; border-radius:12px; padding:10px; display:inline-block; border:1px solid rgba(255,255,255,.08)}
+    .list{margin:10px 0 0 0; padding-left:18px;}
+    footer{margin-top:28px; color:#94a3b8; font-size:.9rem}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo">UC</div>
+        <div>
+          <h1>University Staff Calendar</h1>
+          <small>Subscribe for auto-updates (orientation, study weeks, key dates)</small>
+        </div>
+      </div>
+      <span class="tag" id="statusTag">Checking feed…</span>
+    </header>
+
+    <div class="grid">
+      <!-- Left: Actions -->
+      <div class="card">
+        <h3 style="margin-top:0">Subscribe</h3>
+        <div class="btns">
+          <!-- Apple Calendar & Outlook desktop -->
+          <a class="btn" id="appleBtn" href="webcal://PAULP_USERNAME.github.io/uni-staff-calendar/calendar.ics">Apple Calendar / Outlook (desktop)</a>
+          <!-- Google Calendar (prefill Add-by-URL) -->
+          <a class="btn" target="_blank" rel="noopener" id="gcalBtn" href="https://calendar.google.com/calendar/r?cid=https%3A%2F%2FPAULP_USERNAME.github.io%2Funi-staff-calendar%2Fcalendar.ics">Google Calendar</a>
+          <!-- Outlook on the web helper -->
+          <button class="btn" id="owebBtn">Outlook on the web</button>
+          <!-- Copy link -->
+          <button class="btn" id="copyBtn">Copy calendar link</button>
+        </div>
+
+        <div class="section">
+          <small>
+            Apple/Outlook: opens a subscribe prompt immediately.<br/>
+            Google/Outlook Web: opens the right page (you may click “Add” / paste link).
+          </small>
+        </div>
+
+        <div class="section">
+          <div><strong>Calendar URL</strong></div>
+          <div class="mono" id="icsUrl">https://PAULP_USERNAME.github.io/uni-staff-calendar/calendar.ics</div>
+        </div>
+      </div>
+
+      <!-- Right: QR + Notes -->
+      <div class="card">
+        <div><strong>Scan to subscribe on mobile</strong></div>
+        <div class="section">
+          <div class="qr">
+            <!-- Google Chart QR (simple + reliable) -->
+            <img id="qrImg" alt="QR code to subscribe" width="180" height="180"
+                 src="https://chart.googleapis.com/chart?chs=180x180&cht=qr&chl=webcal%3A%2F%2FPAULP_USERNAME.github.io%2Funi-staff-calendar%2Fcalendar.ics" />
+          </div>
+        </div>
+        <div class="section">
+          <strong>Tips</strong>
+          <ul class="list">
+            <li>All-day items are marked <em>Free</em> so they don’t block your day.</li>
+            <li>Updates appear automatically (Google/Outlook: every few hours; Apple: set Auto-refresh in Get Info).</li>
+            <li>If you imported by mistake, remove it and use the <em>Subscribe</em> button above.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <div id="lastUpdated">Feed status: checking…</div>
+    </footer>
+  </div>
+
+<script>
+  // --- config
+  const USER = "paulpallesen"; // set and forget
+  const ICS_HTTPS = `https://${USER}.github.io/uni-staff-calendar/calendar.ics`;
+  const ICS_WEBCAL = `webcal://${USER}.github.io/uni-staff-calendar/calendar.ics`;
+
+  // Fill dynamic bits
+  document.getElementById('icsUrl').textContent = ICS_HTTPS;
+  document.getElementById('appleBtn').href = ICS_WEBCAL;
+  document.getElementById('gcalBtn').href = `https://calendar.google.com/calendar/r?cid=${encodeURIComponent(ICS_HTTPS)}`;
+  document.getElementById('qrImg').src = `https://chart.googleapis.com/chart?chs=180x180&cht=qr&chl=${encodeURIComponent(ICS_WEBCAL)}`;
+
+  // Outlook web helper: copy URL, open calendar page
+  document.getElementById('owebBtn').addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(ICS_HTTPS); alert("Link copied. In Outlook Web: Add calendar → Subscribe from web → paste."); }
+    catch { prompt("Copy this calendar link:", ICS_HTTPS); }
+    window.open("https://outlook.office.com/calendar/", "_blank", "noopener");
+  });
+
+  // Copy button
+  document.getElementById('copyBtn').addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(ICS_HTTPS); alert("Calendar link copied to clipboard."); }
+    catch { prompt("Copy this calendar link:", ICS_HTTPS); }
+  });
+
+  // Feed status: try HEAD, then fetch a few bytes to confirm
+  (async () => {
+    const statusTag = document.getElementById('statusTag');
+    const last = document.getElementById('lastUpdated');
+    try {
+      // HEAD for last-modified (may be blocked by CORS; fallback to GET slice)
+      let lm = "";
+      try {
+        const h = await fetch(ICS_HTTPS, { method: "HEAD" });
+        lm = h.headers.get("last-modified") || "";
+      } catch {}
+      const r = await fetch(ICS_HTTPS, { method:"GET" });
+      if (!r.ok) throw new Error("Feed not reachable");
+      const text = await r.text();
+      if (text.includes("BEGIN:VCALENDAR")) {
+        statusTag.textContent = "Feed online";
+        statusTag.style.color = "#34d399";
+        last.textContent = `Feed online. ${lm ? "Last modified: " + new Date(lm).toLocaleString() : ""}`;
+      } else {
+        statusTag.textContent = "Feed reachable (no VCALENDAR found)";
+        statusTag.style.color = "#fbbf24";
+        last.textContent = "Feed reachable, but content wasn’t recognized.";
+      }
+    } catch (e) {
+      statusTag.textContent = "Feed offline";
+      statusTag.style.color = "#f87171";
+      last.textContent = "We couldn’t load the feed. Check GitHub Pages and docs/calendar.ics.";
+    }
+  })();
+</script>
+</body>
+</html>
